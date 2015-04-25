@@ -2,6 +2,8 @@ import pygame
 from snapshot import Snapshot
 from window import Window
 
+pygame.init()
+
 window = Window(640, 480)
 
 running = True
