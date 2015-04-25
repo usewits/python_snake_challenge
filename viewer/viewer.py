@@ -14,6 +14,8 @@ while running:
         if event.type == pygame.QUIT:
             running = False
         if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_f:
+                window.toggleFullscreen()
             if event.key == pygame.K_i:
                 window.toggleInfo()
 

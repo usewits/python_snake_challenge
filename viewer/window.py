@@ -12,12 +12,25 @@ class Window:
 
     def __init__(self, width, height):
         self.screen = pygame.display.set_mode((width, height))
+        self.showFullscreen = False
         self.clock = pygame.time.Clock()
         self.mainSurface = pygame.Surface((width - 160, height))
         self.showInfo = True
         self.infoSurface = pygame.Surface((160, height))
         self.infoSurface.fill(Window.backgroundInfo)
         self.font = pygame.font.SysFont("ubuntu", 22)
+
+    def toggleFullscreen(self, on = None):
+        width, height = self.screen.get_size()
+        if on == None:
+            on = not self.showFullscreen
+        if on and not self.showFullscreen:
+            self.screen = pygame.display.set_mode((width, height),
+                    pygame.FULLSCREEN)
+            self.showFullscreen = True
+        elif not on and self.showFullscreen:
+            self.screen = pygame.display.set_mode((width, height))
+            self.showFullscreen = False
 
     def toggleInfo(self, on = None):
         width, height = self.screen.get_size()
