@@ -81,14 +81,21 @@ class Window:
         for i in range(len(snapshot.names)):
             name = self.font.render(snapshot.names[i], 1,
                     Window.snakeColors[colorIndex])
-            self.infoSurface.blit(name, (10, (i+1)*40))
+            self.infoSurface.blit(name, (10, i*60+40))
             score = self.font.render(str(snapshot.scores[i]), 1,
                     Window.snakeColors[colorIndex])
-            self.infoSurface.blit(score, (110, (i+1)*40))
-            for coordinateX, coordinateY in snapshot.snakes[i]:
-                pygame.draw.rect(snakeSurface, Window.snakeColors[colorIndex],
-                        (coordinateX*dx + snakeX, coordinateY*dy + snakeY,
-                         snakeW, snakeH))
+            self.infoSurface.blit(score, (110, i*60+40))
+            if snapshot.status[i] == '':
+                for coordinateX, coordinateY in snapshot.snakes[i]:
+                    pygame.draw.rect(snakeSurface,
+                            Window.snakeColors[colorIndex],
+                            (coordinateX*dx + snakeX, coordinateY*dy + snakeY,
+                             snakeW, snakeH))
+            else:
+                status = self.font.render('('+str(snapshot.status[i])+')', 1,
+                        Window.snakeColors[colorIndex])
+                self.infoSurface.blit(status, (30, i*60+70))
+
             colorIndex += 1
             if colorIndex >= len(Window.snakeColors):
                 colorIndex = 0
