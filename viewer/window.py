@@ -14,14 +14,31 @@ class Window:
         self.screen = pygame.display.set_mode((width, height))
         self.clock = pygame.time.Clock()
         self.mainSurface = pygame.Surface((width - 160, height))
+        self.showInfo = True
         self.infoSurface = pygame.Surface((160, height))
         self.infoSurface.fill(Window.backgroundInfo)
         self.font = pygame.font.SysFont("ubuntu", 22)
 
+    def toggleInfo(self, on = None):
+        width, height = self.screen.get_size()
+        if on == None:
+            on = not self.showInfo
+        if on and not self.showInfo:
+            self.mainSurface = pygame.transform.scale(self.mainSurface,
+                    (width - 160, height))
+            self.infoSurface = pygame.transform.scale(self.infoSurface,
+                    (160, height))
+            self.showInfo = True
+        elif not on and self.showInfo:
+            self.mainSurface = pygame.transform.scale(self.mainSurface,
+                    (width, height))
+            self.showInfo = False
+
     def flip(self):
         width, height = self.screen.get_size()
         self.screen.blit(self.mainSurface, (0, 0))
-        self.screen.blit(self.infoSurface, (width - 160, 0))
+        if self.showInfo:
+            self.screen.blit(self.infoSurface, (width - 160, 0))
         pygame.display.flip()
 
     def pause(self, maxFPS = None):
