@@ -13,14 +13,9 @@ De input neemt de volgende vorm aan:
 3 3         //Coordinaten van speler 2
 1           //Welke speler ben jij
 
-3           //De hoeveelheid nieuw voedsel
-1 2         //Coordinaten van het nieuwe voedsel
-1 5         //Coordinaten van het nieuwe voedsel
-1 2         //Coordinaten van het nieuwe voedsel
-
 Na deze initialisatie komt elke tijdstap de volgende data:
 
-udu         //De bewegingen van speler 0, 1 en 2 (0 en 2 gaan omhoog, 1 naar beneden)
+udu         //De bewegingen van speler 0, 1 en 2 (0 en 2 gaan omhoog, 1 naar beneden) (x als een speler dood is)
 3           //De hoeveelheid nieuw voedsel
 1 2         //Coordinaten van het nieuwe voedsel
 1 5         //Coordinaten van het nieuwe voedsel
