@@ -10,7 +10,7 @@ n_players = 4
 
 print("Assuming you have more than " + str(n_players) + " cores..")
 
-player_bins = ["python example_player.py" for x in range(n_players)]
+player_bins = ["python clever_example_player.py" for x in range(n_players)]
 max_mem = 100000                                        # memory beschikbaar voor spelers in kb
 core_ids = [hex(1<<x) for x in range(n_players)]      # namen van cores
 print(core_ids)
