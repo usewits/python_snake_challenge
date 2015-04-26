@@ -1,3 +1,4 @@
+#!/bin/python
 import random
 import fileinput
 
@@ -26,7 +27,7 @@ while True:
     print(random.choice('udlr'))    #Beweeg! u=up, d=down, l=left, r=right
 
     line = input()                  #Lees nieuwe informatie
-    if line == "quit":              
+    if line == "quit":
         break
 
     speler_bewegingen = line        #String met bewegingen van alle spelers
