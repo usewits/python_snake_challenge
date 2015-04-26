@@ -36,7 +36,7 @@ state.status = [ '' for x in range(n_players)]
 
 # TODO: make beginning coordinates symmetric instead of random
 state.snakes = [ [mazes.get_empty_cell(maze, width, height, str(x))] for x in range(n_players)]
-state.food = [mazes.get_empty_cell(maze, width, height, 'x') for x in n_food_init)]
+state.food = [mazes.get_empty_cell(maze, width, height, 'x') for x in range(n_food_init)]
 
 # Initialize players
 for player_i in range(n_players):
@@ -66,7 +66,7 @@ while True:
 
     # TODO: make symmetric, make sure amounts are right (will crash when no space left!)
     new_moves = ""
-    spawn_food = [mazes.get_empty_cell(maze, width, height, 'x') for x in n_food_iter]
+    spawn_food = [mazes.get_empty_cell(maze, width, height, 'x') for x in range(n_food_iter)]
 
     for player_i in range(n_players): 
         if state.status[player_i] == 'dead':
@@ -77,7 +77,7 @@ while True:
         # Send moves + new food coordinates
         if len(old_moves) > 0:
             p.sendline(old_moves)
-        p.sendline(str(len(spawn_food))
+        p.sendline(str(len(spawn_food)))
         for food in spawn_food:
             p.sendline(str(food[0]) + " " + str(food[1]))
         
@@ -105,7 +105,7 @@ while True:
         heads.append([head_y, head_x])
         if next_pos == 'x':
             tails.append("None") # A snake that eats has no "tail"
-        else
+        else:
             tails.append(state.snakes[player_i][0])
     
     for player_i in range(n_players):
