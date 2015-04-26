@@ -24,8 +24,7 @@ speler_nummer = int(input())        #Lees onze beginpositie
 ###De tijdstap
 
 while True:
-    #print(random.choice('udlr'))    #Beweeg! u=up, d=down, l=left, r=right
-    print('u')
+    print(random.choice('udlr'))    #Beweeg! u=up, d=down, l=left, r=right
 
     line = input()                  #Lees nieuwe informatie
     if line == "quit":

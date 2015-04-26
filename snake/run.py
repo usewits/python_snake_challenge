@@ -12,7 +12,8 @@ print("Assuming you have more than " + str(n_players) + " cores..")
 
 player_bins = ["python example_player.py" for x in range(n_players)]
 max_mem = 100000                                        # memory beschikbaar voor spelers in kb
-core_ids = ["0x"+str(x) for x in range(n_players)]      # namen van cores
+core_ids = [hex(1<<x) for x in range(n_players)]      # namen van cores
+print(core_ids)
                                                         # start restricted processen voor spelers
 players = [pexpect.spawn("./timeout -m "+str(max_mem)+" taskset "+core_ids[x]+" "+player_bins[x]) for x in range(n_players)]
 
@@ -36,8 +37,7 @@ state.status = [ '' for x in range(n_players)]
 
 # TODO: make beginning coordinates symmetric instead of random
 state.snakes = [ [mazes.get_empty_cell(maze, width, height, str(x))] for x in range(n_players)]
-state.food = [mazes.get_empty_cell(maze, width, height, 'x') for x in range(n_food_init)]
-
+state.food = []
 
 # Initialize players
 for player_i in range(n_players):
@@ -46,8 +46,8 @@ for player_i in range(n_players):
 
     p.sendline(str(height))
     p.sendline(str(width))
-    for line in state.content:
-        p.sendline("".join(line))
+    lines = ["".join(line) for line in state.content]
+    p.sendline("\n".join(lines))
     p.sendline(str(n_players))
     for i in range(n_players):
         p.sendline(str(state.snakes[i][0][0])+" "+str(state.snakes[i][0][1]))
@@ -87,12 +87,14 @@ for timestep in range(max_timesteps):
         
         # Read moves
         direction_index = p.expect(direction_chars)
+        print("player "+str(player_i) + " moves "+str(direction_index) + "aka" + direction_chars[direction_index])
         # TODO: check for timeout!
         new_moves += direction_chars[direction_index]
 
     old_moves = new_moves
     spawn_food = [mazes.get_empty_cell(maze, width, height, 'x') for x in range(n_food_iter)]
     
+    print("Moves to be executed: " + new_moves)
 
     # Update snapshot
 
@@ -100,22 +102,30 @@ for timestep in range(max_timesteps):
     tails = []
     for player_i in range(n_players):   # Get all old/new coordinates
         if state.status[player_i] == 'dead':
+            heads.append("Dead")
+            tails.append("Dead")
             continue
         head_x = (state.snakes[player_i][-1][0] +
-                     direction_x[new_moves[player_i]] + 1 + width) % width
+                     direction_x[new_moves[player_i]] + width) % width
         head_y = (state.snakes[player_i][-1][1] +
-                     direction_y[new_moves[player_i]] + 1 + height) % height
+                     direction_y[new_moves[player_i]] + height) % height
         
         next_pos = maze[head_y][head_x]
-        heads.append([head_y, head_x])
+        heads.append([head_x, head_y])
         if next_pos == 'x':
             tails.append("None") # A snake that eats has no "tail"
         else:
             tails.append(state.snakes[player_i][0])
+
+    print("Heads: "+str(heads))
+    print("Tails: "+str(tails))
     
     for player_i in range(n_players):
         if state.status[player_i] == 'dead':
             continue
+
+        head_x = heads[player_i][0]
+        head_y = heads[player_i][1]
 
         next_pos = maze[head_y][head_x]
     
@@ -135,7 +145,7 @@ for timestep in range(max_timesteps):
                     valid_move = False
             
         if valid_move: # The snake can move forward!
-            state.snakes[player_i].append([head_x,head_y])
+            state.snakes[player_i].append([head_x, head_y])
             maze[head_y][head_x] = str(player_i)
             if next_pos != 'x': # If no food is eaten, we must remove the tail
                 tail=state.snakes[player_i].pop(0)
