@@ -143,6 +143,7 @@ for timestep in range(max_timesteps):
         else: # We must have collided (note that you can collide with a dead snake)
             state.status[player_i] = 'dead'
             players[player_i].sendline("quit") # Gently stop the process
+            print("Player "+str(player_i)+" died!")
             # TODO: remove body of dead snake?
             # TODO: force program to exit as well?
 
