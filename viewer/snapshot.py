@@ -15,6 +15,6 @@ class Snapshot:
         self.names = ['Player 1', 'Player 2', 'Player 3']
         self.scores = [100, 50, 10]
         self.status = ['', '', 'dead']
-        self.snakes = [[[1, 2], [1, 3], [2, 3], [3, 3]],
+        self.snakes = [[[1, 2], [1, 3], [2, 3], [3, 3]],    # highest index is head
                        [[3, 1], [3, 0], [4, 0], [0, 0]],
                        []]

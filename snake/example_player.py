@@ -28,6 +28,7 @@ while True:
 
     line = input()                  #Lees nieuwe informatie
     if line == "quit":
+        print("bye")
         break
 
     speler_bewegingen = line        #String met bewegingen van alle spelers

@@ -2,24 +2,29 @@ De input neemt de volgende vorm aan:
 
 5           //De hoogte van het level
 5           //De breedte van het level
-..#..       //Het level. '.' is een leegte, '#' is een muur, 'x' is voedsel
-#x..#
-#.#x#
+..#..       //Het level. '.' is een leegte, '#' is een muur
+#...#
+#.#.#
 .....
 #####
 3           //Het aantal spelers
-2 4         //Coordinaten van speler 1
-1 1         //Coordinaten van speler 2
-3 3         //Coordinaten van speler 3
+2 4         //Coordinaten van speler 0
+1 1         //Coordinaten van speler 1
+3 3         //Coordinaten van speler 2
 1           //Welke speler ben jij
 
+3           //De hoeveelheid nieuw voedsel
+1 2         //Coordinaten van het nieuwe voedsel
+1 5         //Coordinaten van het nieuwe voedsel
+1 2         //Coordinaten van het nieuwe voedsel
 
 Na deze initialisatie komt elke tijdstap de volgende data:
 
-udu         //De bewegingen van speler 1, 2 en 3 (1 en 3 gaan omhoog, 2 naar beneden)
+udu         //De bewegingen van speler 0, 1 en 2 (0 en 2 gaan omhoog, 1 naar beneden)
 3           //De hoeveelheid nieuw voedsel
 1 2         //Coordinaten van het nieuwe voedsel
 1 5         //Coordinaten van het nieuwe voedsel
 1 2         //Coordinaten van het nieuwe voedsel
 
 TODO: toelichten coordinatenstelsel
+
