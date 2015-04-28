@@ -43,15 +43,17 @@ state.food = []
 for player_i in range(n_players):
     print("Initializing player "+str(player_i))
     p = players[player_i]
-
-    p.sendline(str(height))
-    p.sendline(str(width))
+    
+    init_string = ""
+    init_string += str(height) + "\n"
+    init_string += str(width) + "\n"
     lines = ["".join(line) for line in state.content]
-    p.sendline("\n".join(lines))
-    p.sendline(str(n_players))
+    init_string += "\n".join(lines)
+    init_string += str(n_players)+"\n"
     for i in range(n_players):
-        p.sendline(str(state.snakes[i][0][0])+" "+str(state.snakes[i][0][1]))
-    p.sendline(str(player_i))
+        init_string += str(state.snakes[i][0][0])+" "+str(state.snakes[i][0][1]) + "\n"
+    init_string += str(player_i) + "\n"
+    p.sendline(init_string)
 
 direction_chars = ['u',    'd',    'l',    'r']
 direction_x     = {'u': 0, 'd': 0, 'l':-1, 'r': 1}
@@ -80,10 +82,12 @@ for timestep in range(max_timesteps):
 
         # Send moves + new food coordinates
         if len(old_moves) > 0:
-            p.sendline(old_moves)
-            p.sendline(str(len(spawn_food)))
+            update_string = ""
+            update_string += old_moves + "\n"
+            update_string += str(len(spawn_food)) + "\n"
             for food in spawn_food:
-                p.sendline(str(food[0]) + " " + str(food[1]))
+                update_string += str(food[0]) + " " + str(food[1]) + "\n"
+            p.sendline(update_string)
         
         # Read moves
         direction_index = p.expect(direction_chars)
