@@ -85,11 +85,12 @@ for timestep in range(max_timesteps):
             update_string = ""
             update_string += old_moves + "\n"
             update_string += str(len(spawn_food)) + "\n"
-            for food in spawn_food:
-                update_string += str(food[0]) + " " + str(food[1]) + "\n"
+            update_string += "\n".join([str(food[0]) + " " + str(food[1]) for food in spawn_food])
+            print(update_string)
             p.sendline(update_string)
         
         # Read moves
+        p.expect("move")
         direction_index = p.expect(direction_chars)
         print("player "+str(player_i) + " moves "+str(direction_index) + "aka" + direction_chars[direction_index])
         # TODO: check for timeout!
