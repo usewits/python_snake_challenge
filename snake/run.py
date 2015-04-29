@@ -6,11 +6,14 @@ sys.path.append('../viewer')
 import mazes
 import snapshot
 
+import os #TMP
+
 n_players = 4
 
 print("Assuming you have more than " + str(n_players) + " cores..")
 
 player_bins = ["python clever_example_player.py" for x in range(n_players)]
+#player_bins[0] = "python clever_example_player_debug.py"#REMOVE ME
 max_mem = 100000                                        # memory beschikbaar voor spelers in kb
 core_ids = [hex(1<<x) for x in range(n_players)]      # namen van cores
 print(core_ids)
@@ -20,7 +23,6 @@ players = [pexpect.spawn("./timeout -m "+str(max_mem)+" taskset "+core_ids[x]+" 
 
 width = 40
 height = 20
-n_food_init = 10
 
 # maze stores players, food, walls and open space
 maze = mazes.generate_maze(width,height)
@@ -39,20 +41,25 @@ state.status = [ '' for x in range(n_players)]
 state.snakes = [ [mazes.get_empty_cell(maze, width, height, str(x))] for x in range(n_players)]
 state.food = []
 
+os.remove("player0")
+debug_out = open("player0","w")
+
 # Initialize players
 for player_i in range(n_players):
-    print("Initializing player "+str(player_i))
+    #print("Initializing player "+str(player_i))
     p = players[player_i]
     
     init_string = ""
     init_string += str(height) + "\n"
     init_string += str(width) + "\n"
     lines = ["".join(line) for line in state.content]
-    init_string += "\n".join(lines)
-    init_string += str(n_players)+"\n"
+    init_string += "\n".join(lines) + "\n"
+    init_string += str(n_players) + "\n"
     for i in range(n_players):
         init_string += str(state.snakes[i][0][0])+" "+str(state.snakes[i][0][1]) + "\n"
-    init_string += str(player_i) + "\n"
+    init_string += str(player_i)
+    if player_i == 0:
+        debug_out.write(init_string+"\n")
     p.sendline(init_string)
 
 direction_chars = ['u',    'd',    'l',    'r']
@@ -61,13 +68,15 @@ direction_y     = {'u':-1, 'd': 1, 'l': 0, 'r': 0}
 
 n_food_iter = int(n_players/4)
 
-max_timesteps = 10
+max_timesteps = 100
 old_moves = ""
 spawn_food = []
 
 # The time step
 for timestep in range(max_timesteps):
-    mazes.show_maze(maze)
+    print("TIMESTEP "+str(timestep))
+    mazes.show_maze(maze) #DEBUG
+    print("/TIMESTEP "+str(timestep))
     # We will obtain new_moves after passing old_moves to the players
 
     # TODO: make symmetric, make sure amounts are right (will crash when no space left!)
@@ -85,20 +94,26 @@ for timestep in range(max_timesteps):
             update_string = ""
             update_string += old_moves + "\n"
             update_string += str(len(spawn_food)) + "\n"
-            for food in spawn_food:
-                update_string += str(food[0]) + " " + str(food[1]) + "\n"
+            for food_i in range(len(spawn_food)):
+                food = spawn_food[food_i]
+                if food_i != 0:
+                    update_string += "\n"
+                update_string += str(food[0]) + " " + str(food[1])
+            if player_i == 0:
+                debug_out.write(update_string+"\n")
             p.sendline(update_string)
         
         # Read moves
+        p.expect("move")
         direction_index = p.expect(direction_chars)
-        print("player "+str(player_i) + " moves "+str(direction_index) + "aka" + direction_chars[direction_index])
+        #print("player "+str(player_i) + " moves "+str(direction_index) + " aka " + direction_chars[direction_index]) #DEBUG
         # TODO: check for timeout!
         new_moves += direction_chars[direction_index]
 
     old_moves = new_moves
     spawn_food = [mazes.get_empty_cell(maze, width, height, 'x') for x in range(n_food_iter)]
     
-    print("Moves to be executed: " + new_moves)
+    print("Moves to be executed: " + new_moves)#DEBUG
 
     # Update snapshot
 
@@ -121,8 +136,8 @@ for timestep in range(max_timesteps):
         else:
             tails.append(state.snakes[player_i][0])
 
-    print("Heads: "+str(heads))
-    print("Tails: "+str(tails))
+    print("Heads: "+str(heads))#DEBUG
+    print("Tails: "+str(tails))#DEBUG
     
     for player_i in range(n_players):
         if state.status[player_i] == 'dead':
@@ -133,6 +148,9 @@ for timestep in range(max_timesteps):
 
         next_pos = maze[head_y][head_x]
     
+        if player_i == 0:
+            print(str(head_x) + "," + str(head_y))
+            print(next_pos)
         # First we determine if we can move a snake without dying
         valid_move = True 
         if next_pos == '#':
@@ -157,6 +175,8 @@ for timestep in range(max_timesteps):
         else: # We must have collided (note that you can collide with a dead snake)
             state.status[player_i] = 'dead'
             players[player_i].sendline("quit") # Gently stop the process
+            if player_i == 0:
+                debug_out.write("quit"+"\n")
             print("Player "+str(player_i)+" died!")
             # TODO: remove body of dead snake?
             # TODO: force program to exit as well?
