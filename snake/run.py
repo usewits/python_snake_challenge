@@ -94,13 +94,10 @@ for timestep in range(max_timesteps):
             update_string = ""
             update_string += old_moves + "\n"
             update_string += str(len(spawn_food)) + "\n"
-            for food_i in range(len(spawn_food)):
-                food = spawn_food[food_i]
-                if food_i != 0:
-                    update_string += "\n"
-                update_string += str(food[0]) + " " + str(food[1])
+            update_string += "\n".join([str(food[0]) + " " + str(food[1]) for food in spawn_food])
             if player_i == 0:
                 debug_out.write(update_string+"\n")
+            #print(update_string)
             p.sendline(update_string)
         
         # Read moves
