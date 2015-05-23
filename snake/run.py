@@ -48,8 +48,8 @@ for player_i in range(n_players):
     init_string += str(height) + "\n"
     init_string += str(width) + "\n"
     lines = ["".join(line) for line in state.content]
-    init_string += "\n".join(lines)
-    init_string += str(n_players)+"\n"
+    init_string += "\n".join(lines) + "\n"
+    init_string += str(n_players) + "\n"
     for i in range(n_players):
         init_string += str(state.snakes[i][0][0])+" "+str(state.snakes[i][0][1]) + "\n"
     init_string += str(player_i) + "\n"
