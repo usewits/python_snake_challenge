@@ -127,6 +127,17 @@ for timestep in range(max_timesteps):
                      direction_y[new_moves[player_i]] + height) % height
         
         next_pos = maze[head_y][head_x]
+
+        # check if snake collides with itself
+        
+        if next_pos == str(player_i):
+            print("Self-collission "+str(player_i))#DEBUG
+            if states.snakes[player_i][0][0] == head_x and states.snakes[player_i][0][1] == head_y:
+                #no collision
+            else:
+                #collission, set dead
+                #TODO: check above code (is 0 x and 1 y? is it in the correct position, etc)
+
         heads.append([head_x, head_y])
         if next_pos == 'x':
             tails.append("None") # A snake that eats has no "tail"
