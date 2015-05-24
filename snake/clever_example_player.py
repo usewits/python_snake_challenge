@@ -25,10 +25,10 @@ speler_nummer = int(input())        #Lees onze beginpositie
 pos = begin_posities[speler_nummer]
 
 while True:
-    for i in range(15):
-        if i == 0:
-            i += int(random.choice('0123'))
-        if i == 99:
+    i = int(random.choice('0123'))
+    while True
+        i += 1
+        if i > 100:
             print('move')
             print('u')
             break

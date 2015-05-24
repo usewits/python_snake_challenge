@@ -92,7 +92,7 @@ for timestep in range(max_timesteps):
         # Read moves
         p.expect("move")
         direction_index = p.expect(direction_chars)
-        print("player "+str(player_i) + " moves "+str(direction_index) + "aka" + direction_chars[direction_index])
+        print("player "+str(player_i) + " moves " + direction_chars[direction_index])
         # TODO: check for timeout!
         new_moves += direction_chars[direction_index]
 
