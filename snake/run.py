@@ -25,7 +25,7 @@ width = 40
 height = 20
 
 # maze stores players, food, walls and open space
-maze = mazes.generate_maze(width,height)
+maze = mazes.generate_maze(width,height,0.1)
 
 
 # Store state in snapshot
@@ -131,12 +131,18 @@ for timestep in range(max_timesteps):
         # check if snake collides with itself
         
         if next_pos == str(player_i):
-            print("Self-collission "+str(player_i))#DEBUG
-            if states.snakes[player_i][0][0] == head_x and states.snakes[player_i][0][1] == head_y:
-                #no collision
+            print("Potential Self-collission "+str(player_i))#DEBUG
+            if state.snakes[player_i][0][0] == head_x and state.snakes[player_i][0][1] == head_y and len(state.snakes[player_i]) != 2:
+                pass
+                #no collision; on own tail (unless it has length 2)
             else:
-                #collission, set dead
-                #TODO: check above code (is 0 x and 1 y? is it in the correct position, etc)
+                print("Self-collission !!! "+str(player_i))#DEBUG
+                state.status[player_i] = 'dead'
+                heads.append("Dead")
+                tails.append("Dead")
+                continue
+                #self collision
+        #TODO: check above code (is 0 x and 1 y? is it in the correct position, etc)
 
         heads.append([head_x, head_y])
         if next_pos == 'x':
