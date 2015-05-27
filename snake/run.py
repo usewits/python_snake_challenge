@@ -121,14 +121,16 @@ for timestep in range(max_timesteps):
     
     game_log.write("Moves to be executed: " + new_moves + "\n")
 
-    # Update snapshot
 
-    heads = []  # lists of positions about to be added or removed to snakes
-    tails = []
-    for player_i in range(n_players):   # Get all old/new coordinates
+    # Update snapshot
+    player_order = sorted([[state.scores[i], i] for i in range(n_players)])
+
+    print("order:")
+    print(player_order)
+    for index in range(n_players):   # Get all old/new coordinates
+        player_i = player_order[index][1]
+        print("moving "+str(player_i))
         if state.status[player_i] == 'dead':
-            heads.append("Dead")
-            tails.append("Dead")
             continue
         head_x = (state.snakes[player_i][-1][0] +
                      direction_x[new_moves[player_i]] + width) % width
@@ -139,53 +141,7 @@ for timestep in range(max_timesteps):
 
         # check if snake collides with itself
         
-        if next_pos == str(player_i):
-            if state.snakes[player_i][0][0] == head_x and state.snakes[player_i][0][1] == head_y and len(state.snakes[player_i]) != 2:
-                pass
-                #no collision; on own tail (unless it has length 2)
-            else:
-                game_log.write("Player "+str(player_i)+" collided with himself! " + "\n")
-                state.status[player_i] = 'dead'
-                heads.append("Dead")
-                tails.append("Dead")
-                continue
-                #self collision
-        #TODO: check above code (is 0 x and 1 y? is it in the correct position, etc)
-
-        heads.append([head_x, head_y])
-        if next_pos == 'x':
-            tails.append("None") # A snake that eats has no "tail"
-        else:
-            tails.append(state.snakes[player_i][0])
-
-    game_log.write("Heads: "+str(heads) + "\n")#DEBUG
-    game_log.write("Tails: "+str(tails) + "\n")#DEBUG
-    
-    for player_i in range(n_players):
-        if state.status[player_i] == 'dead':
-            continue
-
-        head_x = heads[player_i][0]
-        head_y = heads[player_i][1]
-
-        next_pos = maze[head_y][head_x]
-    
-        # First we determine if we can move a snake without dying
-        valid_move = True 
-        if next_pos == '#':
-            valid_move = False
-        elif next_pos == '.' or next_pos == 'x':
-            if heads.count(heads[player_i]) > 1:    # More than one snake moves here
-                valid_move = False
-        else: # It must be another snake
-            player_other = int(next_pos)
-            valid_move = False
-            if tails[player_other] == heads[player_i]: # The other snake moves away
-                valid_move = True
-                if heads.count(heads[player_i]) > 1: # More than one snake moves here
-                    valid_move = False
-            
-        if valid_move: # The snake can move forward!
+        if next_pos == '.' or next_pos == 'x':
             state.snakes[player_i].append([head_x, head_y])
             maze[head_y][head_x] = str(player_i)
             if next_pos != 'x': # If no food is eaten, we must remove the tail
@@ -194,13 +150,15 @@ for timestep in range(max_timesteps):
                 state.scores[player_i] += 1     #Score +1 if valid move is performed
             else:
                 state.scores[player_i] += 100    #Score +100 if food is consumed
-        else: # We must have collided (note that you can collide with a dead snake)
+
+        else:
+            game_log.write("Player "+str(player_i)+" died!\n")
+            players[player_i].sendline("quit") # Gently stop the process
             state.status[player_i] = 'dead'
             for i in range(n_players):
                 if state.status[i] != 'dead':
                     state.scores[i] += 1000   #Score +1000 if other player dies
-            players[player_i].sendline("quit") # Gently stop the process
-            game_log.write("Player "+str(player_i)+" died!\n")
+            continue
             # TODO: remove body of dead snake?
             # TODO: force program to exit as well?
 
@@ -213,4 +171,5 @@ for i in range(n_players):
 for i in range(n_players):
     player_logs_send[i].close()
     player_logs_read[i].close()
+
 game_log.close()
