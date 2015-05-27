@@ -1,4 +1,5 @@
 import pygame
+import pickle
 from snapshot import Snapshot
 from window import Window
 
@@ -7,6 +8,8 @@ pygame.init()
 window = Window(640, 480)
 
 running = True
+
+snapshot = Snapshot()
 
 while running:
 
@@ -19,7 +22,9 @@ while running:
             if event.key == pygame.K_i:
                 window.toggleInfo()
 
-    snapshot = Snapshot()
+    
+    snapshot = snapshot.load("../snake/logs/state.dat")
+    #pickle.load("../snake/logs/state.dat")
 
     window.drawSnapshot(snapshot)
     window.flip()

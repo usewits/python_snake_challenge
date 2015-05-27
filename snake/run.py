@@ -169,6 +169,7 @@ for timestep in range(max_timesteps):
     if n_players_left == 0: #stop iteration if all players are dead or if game stagnates
         game_log.write("All players are dead!\n")
         break
+    state.save("logs/state.dat")
 
 game_log.write("The game has ended!\n")
 for i in range(n_players):
