@@ -113,6 +113,7 @@ for timestep in range(max_timesteps):
 
     old_moves = new_moves
     spawn_food = [mazes.get_empty_cell(maze, width, height, 'x') for x in range(n_food_iter)]
+    state.food.extend(spawn_food)
     
     game_log.write("Moves to be executed: " + new_moves + "\n")
 
@@ -141,6 +142,7 @@ for timestep in range(max_timesteps):
                 maze[tail[1]][tail[0]] = '.'
                 state.scores[player_i] += 1     #Score +1 if valid move is performed
             else:
+                state.food.remove([head_x,head_y])
                 state.scores[player_i] += 100    #Score +100 if food is consumed
 
         else:
