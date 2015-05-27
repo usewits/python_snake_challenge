@@ -48,9 +48,6 @@ state.status = [ '' for x in range(n_players)]
 state.snakes = [ [mazes.get_empty_cell(maze, width, height, str(x))] for x in range(n_players)]
 state.food = []
 
-os.remove("player0")
-debug_out = open("player0","w")
-
 # Initialize players
 for player_i in range(n_players):
     #print("Initializing player "+str(player_i))
@@ -65,8 +62,6 @@ for player_i in range(n_players):
     for i in range(n_players):
         init_string += str(state.snakes[i][0][0])+" "+str(state.snakes[i][0][1]) + "\n"
     init_string += str(player_i)
-    if player_i == 0:
-        debug_out.write(init_string+"\n")
     p.sendline(str(init_string))
 
 direction_chars = ['u',    'd',    'l',    'r']
@@ -104,8 +99,6 @@ for timestep in range(max_timesteps):
             update_string += old_moves + "\n"
             update_string += str(len(spawn_food)) + "\n"
             update_string += "\n".join([str(food[0]) + " " + str(food[1]) for food in spawn_food])
-            if player_i == 0:
-                debug_out.write(update_string+"\n")
             #print(update_string)
             p.sendline(update_string)
         
@@ -198,18 +191,24 @@ for timestep in range(max_timesteps):
             if next_pos != 'x': # If no food is eaten, we must remove the tail
                 tail=state.snakes[player_i].pop(0)
                 maze[tail[1]][tail[0]] = '.'
+                state.scores[player_i] += 1     #Score +1 if valid move is performed
+            else:
+                state.scores[player_i] += 100    #Score +100 if food is consumed
         else: # We must have collided (note that you can collide with a dead snake)
             state.status[player_i] = 'dead'
+            for i in range(n_players):
+                if state.status[i] != 'dead':
+                    state.scores[i] += 1000   #Score +1000 if other player dies
             players[player_i].sendline("quit") # Gently stop the process
-            if player_i == 0:
-                debug_out.write("quit"+"\n")
             game_log.write("Player "+str(player_i)+" died!\n")
             # TODO: remove body of dead snake?
             # TODO: force program to exit as well?
 
         #TODO: stop iteration if all players are dead or if game stagnates
-        #TODO: scoring
 
+game_log.write("The game has ended!\n")
+for i in range(n_players):
+    game_log.write("Player "+str(i)+" has "+str(state.scores[i])+"pts\n")
 
 for i in range(n_players):
     player_logs_send[i].close()
