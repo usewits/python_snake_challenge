@@ -1,4 +1,5 @@
 import random
+import sys
 
 #Please note: all coordinates are stored as [x, y]
 #one can obtain the data at the corresponding coordinate in a maze using maze[y][x]
@@ -34,6 +35,6 @@ def get_empty_cell(maze, w, h, c='None'):
                 maze[y][x]=c
             return [x,y]
 
-def show_maze(maze):
+def show_maze(maze, fout=sys.stdout):
     for line in maze:
-        print("".join(line))
+        fout.write("".join(line)+"\n")
