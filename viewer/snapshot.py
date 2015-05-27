@@ -1,8 +1,21 @@
-class Snapshot:
+import pickle
+
+class Snapshot(object):
 
     def __init__(self, filename = None):
         self.bogusData()
 
+    def save(self, filename):
+        outstream = open(filename, 'wb')
+        pickle.dump(self, outstream, protocol=2)
+        outstream.close()
+
+    def load(self, filename):
+        instream = open(filename, 'rb')
+        tmp = pickle.load(instream)
+        instream.close()
+        return tmp
+        
     def bogusData(self):
         self.width = 5
         self.height = 5
