@@ -6,8 +6,6 @@ sys.path.append('../viewer')
 import mazes
 import snapshot
 
-import os #TMP
-
 n_players = 4
 
 print("Assuming you have more than " + str(n_players) + " cores..")
@@ -50,7 +48,6 @@ state.food = []
 
 # Initialize players
 for player_i in range(n_players):
-    #print("Initializing player "+str(player_i))
     p = players[player_i]
     
     init_string = ""
@@ -99,7 +96,6 @@ for timestep in range(max_timesteps):
             update_string += old_moves + "\n"
             update_string += str(len(spawn_food)) + "\n"
             update_string += "\n".join([str(food[0]) + " " + str(food[1]) for food in spawn_food])
-            #print(update_string)
             p.sendline(update_string)
         
         # Read moves
@@ -112,7 +108,6 @@ for timestep in range(max_timesteps):
             state.status[player_i] = 'dead'
             new_moves += 'x'
             continue
-        #print("player "+str(player_i) + " moves "+str(direction_index) + " aka " + direction_chars[direction_index]) #DEBUG
         # TODO: check for timeout!
         new_moves += direction_chars[direction_index]
 
@@ -124,10 +119,7 @@ for timestep in range(max_timesteps):
 
     # Update snapshot
     player_order = sorted([[state.scores[i], i] for i in range(n_players)])
-
-    print("order:")
-    print(player_order)
-    for index in range(n_players):   # Get all old/new coordinates
+    for index in range(n_players):   # Move all players (low scores move first)
         player_i = player_order[index][1]
         print("moving "+str(player_i))
         if state.status[player_i] == 'dead':
@@ -152,7 +144,15 @@ for timestep in range(max_timesteps):
                 state.scores[player_i] += 100    #Score +100 if food is consumed
 
         else:
-            game_log.write("Player "+str(player_i)+" died!\n")
+            game_log.write("Player "+str(player_i)+" ")
+            if next_pos == str(player_i):
+                game_log.write("killed himself!\n")
+            elif next_pos == '#':
+                game_log.write("ran into a wall!\n")
+            else:#must be other player
+                other_player = int(next_pos)
+                game_log.write("was killed by player "+str(other_player)+"!\n")
+                
             players[player_i].sendline("quit") # Gently stop the process
             state.status[player_i] = 'dead'
             for i in range(n_players):
@@ -162,7 +162,13 @@ for timestep in range(max_timesteps):
             # TODO: remove body of dead snake?
             # TODO: force program to exit as well?
 
-        #TODO: stop iteration if all players are dead or if game stagnates
+    n_players_left = n_players
+    for i in range(n_players):
+        if state.status[i] == 'dead':
+            n_players_left-=1
+    if n_players_left == 0: #stop iteration if all players are dead or if game stagnates
+        game_log.write("All players are dead!\n")
+        break
 
 game_log.write("The game has ended!\n")
 for i in range(n_players):
