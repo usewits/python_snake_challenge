@@ -62,13 +62,14 @@ class Window:
         x, y = self.mainSurface.get_size()
         dx, dy = x / snapshot.width, y / snapshot.height
 
+        # Draw background
+        pygame.draw.rect(self.mainSurface, Window.background, (0, 0, x, y))
+        pygame.draw.rect(self.infoSurface, Window.background, (0, 0, 160, y))
+
         # Second, draw background and walls
         for i in range(snapshot.width):
             for j in range(snapshot.height):
-                if snapshot.content[j][i] == '.':
-                    pygame.draw.rect(self.mainSurface, Window.background,
-                            (i*dx, j*dy, dx, dy))
-                elif snapshot.content[j][i] == '#':
+                if snapshot.content[j][i] == '#':
                     pygame.draw.rect(self.mainSurface, Window.walls,
                             (i*dx, j*dy, dx, dy))
 
@@ -85,13 +86,13 @@ class Window:
             score = self.font.render(str(snapshot.scores[i]), 1,
                     Window.snakeColors[colorIndex])
             self.infoSurface.blit(score, (110, i*60+40))
-            if snapshot.status[i] == '':
-                for coordinateX, coordinateY in snapshot.snakes[i]:
-                    pygame.draw.rect(snakeSurface,
-                            Window.snakeColors[colorIndex],
-                            (coordinateX*dx + snakeX, coordinateY*dy + snakeY,
-                             snakeW, snakeH))
-            else:
+            for coordinateX, coordinateY in snapshot.snakes[i]:
+                snapshot.status[i] == '':
+                pygame.draw.rect(snakeSurface,
+                        Window.snakeColors[colorIndex],
+                        (coordinateX*dx + snakeX, coordinateY*dy + snakeY,
+                         snakeW, snakeH))
+            if snapshot.status[i] != '':
                 status = self.font.render('('+str(snapshot.status[i])+')', 1,
                         Window.snakeColors[colorIndex])
                 self.infoSurface.blit(status, (30, i*60+70))

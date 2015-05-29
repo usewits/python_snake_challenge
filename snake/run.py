@@ -27,7 +27,7 @@ for i in range(n_players):
 
 
 width = 40
-height = 20
+height = 40
 
 # maze stores players, food, walls and open space
 maze = mazes.generate_maze(width,height,0.1)
@@ -38,7 +38,7 @@ state = snapshot.Snapshot()
 state.width = width
 state.height = height
 state.content = maze
-state.names = player_bins
+state.names = [player_bin[7:min(14,len(player_bin)-3)] for player_bin in player_bins]
 state.scores = [  0 for x in range(n_players)]
 state.status = [ '' for x in range(n_players)]
 
