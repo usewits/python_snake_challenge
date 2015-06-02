@@ -19,6 +19,7 @@ class Window:
         self.infoSurface = pygame.Surface((160, height))
         self.infoSurface.fill(Window.backgroundInfo)
         self.font = pygame.font.SysFont("ubuntu", 22)
+        self.interaction_stream = open("keys.txt", "w")
 
     def toggleFullscreen(self, on = None):
         width, height = self.screen.get_size()
@@ -87,7 +88,7 @@ class Window:
                     Window.snakeColors[colorIndex])
             self.infoSurface.blit(score, (110, i*60+40))
             for coordinateX, coordinateY in snapshot.snakes[i]:
-                snapshot.status[i] == '':
+                snapshot.status[i] == ''
                 pygame.draw.rect(snakeSurface,
                         Window.snakeColors[colorIndex],
                         (coordinateX*dx + snakeX, coordinateY*dy + snakeY,

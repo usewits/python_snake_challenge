@@ -1,6 +1,7 @@
-#!/bin/python
+#!/bin/python3
 import pexpect
 import sys
+import signal
 
 sys.path.append('../viewer')
 import mazes
@@ -10,8 +11,9 @@ n_players = 4
 
 print("Assuming you have more than " + str(n_players) + " cores..")
 
-player_bins = ["python clever_example_player2.py" for x in range(n_players)]
-#player_bins[0] = "python clever_example_player_debug.py"#REMOVE ME
+player_bins = ["python simple_example_player.py" for x in range(n_players)]
+player_bins[0] = "python clever_example_player2.py"
+#player_bins[3] = "#human"    # human player!
 max_mem = 100000                                        # memory beschikbaar voor spelers in kb
 core_ids = [hex(1<<x) for x in range(n_players)]      # namen van cores
 print(core_ids)
@@ -71,6 +73,29 @@ max_timesteps = 500
 old_moves = ""
 spawn_food = []
 
+def _find_getch():
+    try:
+        import termios
+    except ImportError:
+        # Non-POSIX. Return msvcrt's (Windows') getch.
+        import msvcrt
+        return msvcrt.getch
+
+    # POSIX system. Create and return a getch that manipulates the tty.
+    import sys, tty
+    def _getch():
+        fd = sys.stdin.fileno()
+        old_settings = termios.tcgetattr(fd)
+        try:
+            tty.setraw(fd)
+            ch = sys.stdin.read(1)
+        finally:
+            termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
+        return ch
+
+    return _getch
+getch = _find_getch()
+
 # The time step
 for timestep in range(max_timesteps):
     game_log.write("TIMESTEP "+str(timestep)+"\n")
@@ -81,11 +106,14 @@ for timestep in range(max_timesteps):
     # We will obtain new_moves after passing old_moves to the players
 
     # TODO: make symmetric, make sure amounts are right (will crash when no space left!)
-    new_moves = ""
+    new_moves = ["?"]*n_players
 
-    for player_i in range(n_players): 
+    player_order = sorted([[state.scores[i], i] for i in range(n_players)])
+    for index in range(n_players): 
+        player_i = player_order[index][1]
+
         if state.status[player_i] == 'dead':
-            new_moves += 'x'
+            new_moves[player_i] = 'x'
             continue
 
         p = players[player_i]
@@ -93,35 +121,36 @@ for timestep in range(max_timesteps):
         # Send moves + new food coordinates
         if len(old_moves) > 0:
             update_string = ""
-            update_string += old_moves + "\n"
+            update_string += "".join(old_moves) + "\n"
             update_string += str(len(spawn_food)) + "\n"
             update_string += "\n".join([str(food[0]) + " " + str(food[1]) for food in spawn_food])
             p.sendline(update_string)
         
         # Read moves
         try:
-            p.expect("move")
-            direction_index = p.expect(direction_chars)
+            if player_bins[player_i] == "#human":   #For humans only!
+                char = getch()
+                direction_index = "wsad".find(char)
+            else:
+                p.expect("move")
+                direction_index = p.expect(direction_chars)
         except:
             game_log.write("Player "+str(player_i)+"'s AI crashed!\n")
             game_log.write("As a result, player "+str(player_i)+" has been declared dead\n")
             state.status[player_i] = 'dead'
-            new_moves += 'x'
+            new_moves[player_i] = 'x'
             continue
         # TODO: check for timeout!
-        new_moves += direction_chars[direction_index]
+        new_moves[player_i] = direction_chars[direction_index]
 
     old_moves = new_moves
-    spawn_food = [mazes.get_empty_cell(maze, width, height, 'x') for x in range(n_food_iter)]
-    state.food.extend(spawn_food)
     
-    game_log.write("Moves to be executed: " + new_moves + "\n")
-
+    game_log.write("Moves to be executed: " + "".join(new_moves) + "\n")
 
     # Update snapshot
-    player_order = sorted([[state.scores[i], i] for i in range(n_players)])
     for index in range(n_players):   # Move all players (low scores move first)
         player_i = player_order[index][1]
+
         print("moving "+str(player_i))
         if state.status[player_i] == 'dead':
             continue
@@ -133,7 +162,6 @@ for timestep in range(max_timesteps):
         next_pos = maze[head_y][head_x]
 
         # check if snake collides with itself
-        
         if next_pos == '.' or next_pos == 'x':
             state.snakes[player_i].append([head_x, head_y])
             maze[head_y][head_x] = str(player_i)
@@ -144,7 +172,6 @@ for timestep in range(max_timesteps):
             else:
                 state.food.remove([head_x,head_y])
                 state.scores[player_i] += 100    #Score +100 if food is consumed
-
         else:
             game_log.write("Player "+str(player_i)+" ")
             if next_pos == str(player_i):
@@ -164,10 +191,15 @@ for timestep in range(max_timesteps):
             # TODO: remove body of dead snake?
             # TODO: force program to exit as well?
 
+    # Spawn new food
+    spawn_food = [mazes.get_empty_cell(maze, width, height, 'x') for x in range(n_food_iter)]
+    state.food.extend(spawn_food)
+
+    # Check if we need to terminate the game
     n_players_left = n_players
     for i in range(n_players):
         if state.status[i] == 'dead':
-            n_players_left-=1
+            n_players_left -= 1
     if n_players_left == 0: #stop iteration if all players are dead or if game stagnates
         game_log.write("All players are dead!\n")
         break
