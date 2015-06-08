@@ -3,7 +3,6 @@ import pexpect
 import sys
 import signal
 
-
 sys.path.append('../viewer')
 import mazes
 import snapshot
