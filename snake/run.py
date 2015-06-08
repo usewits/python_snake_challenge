@@ -3,6 +3,7 @@ import pexpect
 import sys
 import signal
 
+
 sys.path.append('../viewer')
 import mazes
 import snapshot
@@ -28,8 +29,8 @@ for i in range(n_players):
     players[i].logfile_read = player_logs_read[i]
 
 
-width = 40
-height = 40
+width = 10
+height = 10
 
 # maze stores players, food, walls and open space
 maze = mazes.generate_maze(width,height,0.1)
