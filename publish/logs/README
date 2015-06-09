@@ -1,0 +1,9 @@
+In this folder all logs are stored.
+
+game.txt contains all game information
+
+in*.txt contains all data send to player *
+
+all*.txt contains all data send to/recieved from player * 
+        This includes crash reports from player * !
+

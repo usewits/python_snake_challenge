@@ -165,6 +165,7 @@ for timestep in range(max_timesteps):
         player_i = player_order[index][1]
 
         print("moving "+str(player_i) + "(with "+str(state.scores[player_i])+" points)")
+        game_log.write("Player "+str(player_i) + " has "+str(state.scores[player_i])+" points)")
         if state.status[player_i] == 'dead':
             continue
         head_x = (state.snakes[player_i][-1][0] +
